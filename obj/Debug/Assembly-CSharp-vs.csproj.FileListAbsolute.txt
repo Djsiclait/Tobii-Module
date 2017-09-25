@@ -1,0 +1,12 @@
+C:\Users\Lidan\Documents\DynamicSizeGrid\Temp\bin\Debug\Assembly-CSharp.dll
+C:\Users\Lidan\Documents\DynamicSizeGrid\Temp\bin\Debug\Assembly-CSharp.pdb
+C:\Users\Lidan\Documents\DynamicSizeGrid\Temp\bin\Debug\UnityEditor.dll
+C:\Users\Lidan\Documents\DynamicSizeGrid\Temp\bin\Debug\UnityEngine.dll
+C:\Users\Lidan\Documents\DynamicSizeGrid\Temp\bin\Debug\UnityEngine.UI.dll
+C:\Users\Lidan\Documents\DynamicSizeGrid\Temp\bin\Debug\Mono.Cecil.dll
+C:\Users\Lidan\Documents\DynamicSizeGrid\Temp\bin\Debug\nunit.framework.dll
+C:\Users\Lidan\Documents\DynamicSizeGrid\Temp\bin\Debug\Unity.DataContract.dll
+C:\Users\Lidan\Documents\DynamicSizeGrid\Temp\bin\Debug\ICSharpCode.NRefactory.dll
+C:\Users\Lidan\Documents\DynamicSizeGrid\obj\Debug\Assembly-CSharp-vs.csprojResolveAssemblyReference.cache
+C:\Users\Lidan\Documents\DynamicSizeGrid\obj\Debug\Assembly-CSharp.dll
+C:\Users\Lidan\Documents\DynamicSizeGrid\obj\Debug\Assembly-CSharp.pdb
