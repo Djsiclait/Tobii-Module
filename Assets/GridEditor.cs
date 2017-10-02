@@ -24,7 +24,7 @@ public class GridEditor : MonoBehaviour {
         {
             // Create an instance of StreamReader to read from a file.
             // The using statement also closes the StreamReader.
-            using (StreamReader sr = new StreamReader("C:/Users/mc/Desktop/HelloWorld.txt"))
+            using (StreamReader sr = new StreamReader("C:/Users/Djidjelly Siclait/Desktop/Hello.txt"))
             {
                 string line;
 
