@@ -6,7 +6,10 @@ using System;
 using Tobii.Gaming;
 public class GridEditor : MonoBehaviour {
 
-    private int counter = 0;
+    private int xcounter = 0;
+    private int ycounter = 0;
+    private int pagestart = 0;
+    private int pageend= 10;
     private int currentRowLength = 0;
     public GameObject page;
     public GameObject row;
@@ -21,7 +24,7 @@ public class GridEditor : MonoBehaviour {
         {
             // Create an instance of StreamReader to read from a file.
             // The using statement also closes the StreamReader.
-            using (StreamReader sr = new StreamReader("C:/Users/Djidjelly Siclait/Desktop/HelloWorld.txt"))
+            using (StreamReader sr = new StreamReader("C:/Users/mc/Desktop/HelloWorld.txt"))
             {
                 string line;
 
@@ -61,14 +64,14 @@ public class GridEditor : MonoBehaviour {
     public void AddItemToGrid(GameObject firstRow)
     {
         GameObject currentRow = firstRow;
-        while (counter < words.Count) {
+        while (xcounter < words.Count && ycounter < pageend) {
             if (currentRowLength < maxRowlength)
             {
-                currentRowLength += words[counter].ToString().Length;
+                currentRowLength += words[xcounter].ToString().Length;
                 GameObject newText = Instantiate(word);
                 TextMesh temp = newText.GetComponent(typeof(TextMesh)) as TextMesh;
                 BoxCollider boxCollider = newText.GetComponent(typeof(BoxCollider)) as BoxCollider;
-                temp.text = words[counter].ToString();
+                temp.text = words[xcounter].ToString();
                 temp.characterSize = 25;
                 print(temp.text);
                 newText.AddComponent<BoxCollider>();
@@ -79,11 +82,12 @@ public class GridEditor : MonoBehaviour {
             else {
                 currentRowLength = 0;
                 var newrow = Instantiate(row) as GameObject;
+                ycounter++;
                 //newText.text = string.Format("Item {0}", counter.ToString());
                 currentRow = newrow;
                 currentRow.transform.parent = page.transform;
             }
-            counter++;
+            xcounter++;
         }
        
     }
