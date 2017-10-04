@@ -138,6 +138,7 @@
      <Compile Include="Assets\Tobii\Framework\TobiiAPI.cs" />
      <Compile Include="Assets\Tobii\Framework\UserPresence.cs" />
      <Compile Include="Assets\Tobii\Plugins\SimpleJSON.cs" />
+     <Compile Include="Assets\nextPageController.cs" />
      <None Include="Assets\Tobii\DemoScenes\Shaders\Highlight\MobileBlur.shader" />
      <None Include="Assets\Tobii\Readme.txt" />
      <None Include="Assets\Tobii\DemoScenes\Shaders\Water\Shaders\FXWaterPro.shader" />

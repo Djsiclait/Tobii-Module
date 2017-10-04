@@ -9,11 +9,13 @@ public class GridEditor : MonoBehaviour {
     private int xcounter = 0;
     private int ycounter = 0;
     private int pagestart = 0;
-    private int pageend= 10;
+    private int pageend= 8;
     private int currentRowLength = 0;
+    private GameObject firstrow;
     public GameObject page;
     public GameObject row;
     public GameObject word;
+    public Button nextPage;
     private ArrayList words;
     private static int maxRowlength = 80;
     // Use this for initialization
@@ -35,6 +37,7 @@ public class GridEditor : MonoBehaviour {
                     words.AddRange(line.Split(' '));
                 }
             }
+
         }
         catch (Exception e)
         {
@@ -43,14 +46,16 @@ public class GridEditor : MonoBehaviour {
             Console.WriteLine("The file could not be read:");
             Console.WriteLine(e.Message);
         }
-        var firstrow = Instantiate(row) as GameObject;
+        firstrow = Instantiate(row) as GameObject;
         //newText.text = string.Format("Item {0}", counter.ToString());
         firstrow.transform.parent = page.transform;
-        AddItemToGrid(firstrow);
+        //AddItemToGrid(firstrow);
+        nextPage.onClick.AddListener(AddItemToGrid);
+        //AddItemToGrid();
     }
-	
-	// Update is called once per frame
-	void Update () {
+
+    // Update is called once per frame
+    void Update () {
         //if (TobiiAPI.GetFocusedObject() != null) {
         //  print(TobiiAPI.GetFocusedObject().name);
         //}
@@ -61,9 +66,9 @@ public class GridEditor : MonoBehaviour {
         }
     }
 
-    public void AddItemToGrid(GameObject firstRow)
+    public void AddItemToGrid()
     {
-        GameObject currentRow = firstRow;
+        GameObject currentRow = firstrow;
         while (xcounter < words.Count && ycounter < pageend) {
             if (currentRowLength < maxRowlength)
             {
