@@ -92,12 +92,7 @@ public class GridEditor : MonoBehaviour {
             Console.WriteLine(e.Message);
         }
 
-        firstrow = Instantiate(row) as GameObject;
-        //newText.text = string.Format("Item {0}", counter.ToString());
-        firstrow.transform.parent = page.transform;
-        //AddItemToGrid(firstrow);
-        nextPage.onClick.AddListener(AddItemToGrid);
-        //AddItemToGrid();
+        init();
     }
 
     // Update is called once per frame
@@ -161,5 +156,15 @@ public class GridEditor : MonoBehaviour {
             currentpage++;
         else
             currentpage = 0;
+    }
+
+    private void init()
+    {
+        firstrow = Instantiate(row) as GameObject;
+        //newText.text = string.Format("Item {0}", counter.ToString());
+        firstrow.transform.parent = page.transform;
+        //AddItemToGrid(firstrow);
+        nextPage.onClick.AddListener(AddItemToGrid);
+        //AddItemToGrid();
     }
 }
