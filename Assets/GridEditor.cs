@@ -122,13 +122,9 @@ public class GridEditor : MonoBehaviour {
         GameObject currentRow = firstrow;
 
         ArrayList data = new ArrayList();
-        int counter = 0;
 
-        foreach (ArrayList a in pages)
-            if (counter == currentpage)
-                data = a;
-            else
-                counter++;
+        data = pages[currentpage];
+
         print(data.Count);
         xcounter = 0;
         ycounter = 0;
@@ -143,7 +139,7 @@ public class GridEditor : MonoBehaviour {
                     BoxCollider boxCollider = newText.GetComponent(typeof(BoxCollider)) as BoxCollider;
                     temp.text = data[xcounter].ToString();
                     temp.characterSize = 25;
-                    print(temp.text);
+                    //print(temp.text);
                     newText.AddComponent<BoxCollider>();
                     newText.name = temp.text;
                     //newText.text = string.Format("Item {0}", counter.ToString());
