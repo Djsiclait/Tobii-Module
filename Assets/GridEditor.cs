@@ -21,8 +21,8 @@ public class GridEditor : MonoBehaviour {
     private ArrayList words;
     private List<ArrayList> pages;
     private int currentpage;
-    private static int maxRowlength = 80;
-    private static int maxLineLength = 5;
+    private static int maxRowlength = 20;
+    private static int maxLines = 5;
     private int numPages;
     // Use this for initialization
     void Start () {
@@ -45,22 +45,42 @@ public class GridEditor : MonoBehaviour {
                 }
             }
 
-            numPages = words.Count / (maxRowlength * maxLineLength);
+            numPages = (int)Math.Ceiling((decimal)words.Count / (decimal)(maxRowlength * maxLines));
             print(words.Count);
             print(numPages);
 
-            for (int i = 0; i < numPages; i++)
+            int j = 0;
+            int counter = 1;
+            ArrayList buffer = new ArrayList();
+
+            foreach(String s in words)
             {
-                ArrayList buffer = new ArrayList();
-
-                for (int j = (maxRowlength * maxLineLength) * i; j < (maxRowlength * maxLineLength) * (i + 1); j++)
+                if (counter < numPages) // first and next pages
                 {
-                    while (j < words.Count)
-                        buffer.Add(words[j]);
+                    if (j < (maxRowlength * maxLines) - 1)
+                    {
+                        buffer.Add(s);
+                        j++;
+                    }
+                    else
+                    {
+                        buffer.Add(s);
+                        print("buffer = " + buffer.Count);
+                        pages.Add(buffer);
+                        j = 0; counter++;
+                        buffer = new ArrayList();
+                    }
                 }
-
-                pages.Add(buffer);
+                else // last page
+                {
+                    buffer.Add(s);
+                }
             }
+            
+            print("buffer = " + buffer.Count);
+            pages.Add(buffer);
+
+            print("Pages =" + pages.Count);
             currentpage = 0;
 
         }
@@ -99,9 +119,6 @@ public class GridEditor : MonoBehaviour {
 
     public void AddItemToGrid()
     {
-        foreach (Transform child in page.transform)
-            child.parent = null;
-
         GameObject currentRow = firstrow;
 
         ArrayList data = new ArrayList();
@@ -112,7 +129,7 @@ public class GridEditor : MonoBehaviour {
                 data = a;
             else
                 counter++;
-
+        print(data.Count);
         xcounter = 0;
         ycounter = 0;
 
