@@ -107,6 +107,25 @@ public class GridEditor : MonoBehaviour {
         }
     }
 
+    public void clearpage(int direction) {
+        /*foreach (Transform childTransform in page.transform) {
+            foreach (Transform childTransform2 in childTransform.transform) {
+                Destroy(childTransform2.gameObject);
+            }
+                }*/
+        int childs = page.transform.childCount;
+        print("page has " + childs + "childs");
+        for (int i = childs - 1; i > 0; i--)
+        {
+            print("erasing page "+page.transform.GetChild(i).name);
+            page.transform.GetChild(i).SetParent(null);
+
+        }
+        if (direction > 0) {
+            AddItemToGrid();
+        } else { GoBack();  }
+    }
+
     public void GoBack()
     {
         AddItemToGrid();
@@ -114,6 +133,8 @@ public class GridEditor : MonoBehaviour {
 
     public void AddItemToGrid()
     {
+
+
         GameObject currentRow = firstrow;
 
         ArrayList data = new ArrayList();
@@ -139,7 +160,8 @@ public class GridEditor : MonoBehaviour {
                     newText.name = temp.text;
                     //newText.text = string.Format("Item {0}", counter.ToString());
                     newText.transform.parent = currentRow.transform;
-                }
+                currentRow.name = "row # " + ycounter;
+            }
                 else
                 {
                     currentRowLength = 0;
@@ -148,6 +170,7 @@ public class GridEditor : MonoBehaviour {
                     //newText.text = string.Format("Item {0}", counter.ToString());
                     currentRow = newrow;
                     currentRow.transform.parent = page.transform;
+                currentRow.name = "row # "+ycounter;
                 }
                 xcounter++;
             }
