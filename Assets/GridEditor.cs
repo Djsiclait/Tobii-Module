@@ -93,6 +93,7 @@ public class GridEditor : MonoBehaviour {
         }
 
         init();
+        AddItemToGrid();
     }
 
     // Update is called once per frame
@@ -107,12 +108,32 @@ public class GridEditor : MonoBehaviour {
         }
     }
 
-    public void clearpage(int direction) {
-        /*foreach (Transform childTransform in page.transform) {
-            foreach (Transform childTransform2 in childTransform.transform) {
-                Destroy(childTransform2.gameObject);
+    public void clearpage(int direction)
+    {
+        print("direction" + direction);
+        GameObject parentObj = GameObject.Find("Page");
+        int childs = parentObj.transform.childCount;
+        print("page has " + childs + "childs");
+        foreach (Transform childTransform in parentObj.transform)
+        {
+            print(""+childTransform.name);
+            if (childTransform.name == "row # 0")
+            {
+                print("first row");
+                foreach (Transform childTransform2 in childTransform.transform)
+                {
+                    print("" + childTransform2.name);
+                    childTransform2.parent = null;
+                    Destroy(childTransform2.gameObject);
+                }
             }
-                }*/
+            else
+            {
+                Destroy(childTransform.gameObject);
+            }
+            //}
+        }
+        /*
         int childs = page.transform.childCount;
         print("page has " + childs + "childs");
         for (int i = childs - 1; i > 0; i--)
@@ -120,10 +141,12 @@ public class GridEditor : MonoBehaviour {
             print("erasing page "+page.transform.GetChild(i).name);
             page.transform.GetChild(i).SetParent(null);
 
-        }
-        if (direction > 0) {
+        }*/
+        if (direction > 0)
+        {
             AddItemToGrid();
-        } else { GoBack();  }
+        }
+        else { GoBack(); }
     }
 
     public void GoBack()
@@ -153,7 +176,12 @@ public class GridEditor : MonoBehaviour {
                     GameObject newText = Instantiate(word);
                     TextMesh temp = newText.GetComponent(typeof(TextMesh)) as TextMesh;
                     BoxCollider boxCollider = newText.GetComponent(typeof(BoxCollider)) as BoxCollider;
+                if (data[xcounter].ToString().Length < 5)
+                    temp.text = "__" + data[xcounter].ToString() + "_";
+                else
+                {
                     temp.text = data[xcounter].ToString();
+                }
                     temp.characterSize = 25;
                     //print(temp.text);
                     newText.AddComponent<BoxCollider>();
