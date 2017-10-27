@@ -6,34 +6,41 @@ using System;
 using Tobii.Gaming;
 using System.Collections.Generic;
 
-public class GridEditor : MonoBehaviour {
+public class GridEditor : MonoBehaviour
+{
 
     private int xcounter = 0;
     private int ycounter = 0;
     private int pagestart = 0;
-    private int pageend= 8;
+    private int pageend = 8;
     private int currentRowLength = 0;
     private GameObject firstrow;
     public GameObject page;
     public GameObject row;
+    public GameObject grid;
     public GameObject word;
     public Button nextPage;
     private ArrayList words;
     private List<ArrayList> pages;
     private int currentpage;
-    private static int maxRowlength = 20;
+    private static int maxRowlength;
     private static int maxLines = 5;
     private int numPages;
+    private GazePoint pos;
+    private GameObject focusedObject;
+
     // Use this for initialization
-    void Start () {
+    void Start()
+    {
         words = new ArrayList();
         pages = new List<ArrayList>();
-        maxRowlength = 80;
+        maxRowlength = 120;
+        pos = TobiiAPI.GetGazePoint();
         try
         {
             // Create an instance of StreamReader to read from a file.
             // The using statement also closes the StreamReader.
-            using (StreamReader sr = new StreamReader("C:/Users/Djidjelly Siclait/Desktop/Hello.txt"))
+            using (StreamReader sr = new StreamReader("C:\\Users\\mc\\IdeaProjects\\ReadingButler\\src\\main\\resources\\ReadingButlerExerciseTemplates\\data.txt"))
             {
                 string line;
 
@@ -53,7 +60,7 @@ public class GridEditor : MonoBehaviour {
             int counter = 1;
             ArrayList buffer = new ArrayList();
 
-            foreach(String s in words)
+            foreach (String s in words)
             {
                 if (counter < numPages) // first and next pages
                 {
@@ -76,7 +83,7 @@ public class GridEditor : MonoBehaviour {
                     buffer.Add(s);
                 }
             }
-            
+
             print("buffer = " + buffer.Count);
             pages.Add(buffer);
 
@@ -93,74 +100,98 @@ public class GridEditor : MonoBehaviour {
         }
 
         init();
-        AddItemToGrid();
+        AddItemToGrid(0);
+    }
+
+    public void fixit()
+    {
+        //Canvas.ForceUpdateCanvases();
+        RectTransform T = page.GetComponent(typeof(RectTransform)) as RectTransform;
+        LayoutRebuilder.ForceRebuildLayoutImmediate(T);
     }
 
     // Update is called once per frame
-    void Update () {
+    void Update()
+    {
         //if (TobiiAPI.GetFocusedObject() != null) {
         //  print(TobiiAPI.GetFocusedObject().name);
         //}
-        GameObject focusedObject = TobiiAPI.GetFocusedObject();
+        focusedObject = TobiiAPI.GetFocusedObject();
+        pos = TobiiAPI.GetGazePoint();
+
         if (null != focusedObject)
         {
+            using (System.IO.StreamWriter file =
+            new System.IO.StreamWriter(@"C:\Users\mc\Desktop\IdTime.txt", true))
+            {
+                file.WriteLine("" + focusedObject.GetInstanceID() + "," + Time.time);
+            }
+
+            /*using (System.IO.StreamWriter file = 
+				new System.IO.StreamWriter(@"C:\Users\mc\Desktop\WriteLines2.txt", true))
+			{
+				file.WriteLine("The focused game object is: " + focusedObject.name + " (ID: " + focusedObject.GetInstanceID() + ")");
+				file.WriteLine(""+focusedObject.GetInstanceID());
+			}*/
             print("The focused game object is: " + focusedObject.name + " (ID: " + focusedObject.GetInstanceID() + ")");
+        }
+        else
+        {
+            using (System.IO.StreamWriter file =
+            new System.IO.StreamWriter(@"C:\Users\mc\Desktop\IdTime.txt", true))
+            {
+                file.WriteLine("N/A , " + Time.time);
+            }
+
+        }
+        using (System.IO.StreamWriter file =
+                new System.IO.StreamWriter(@"C:\Users\mc\Desktop\posTime.txt", true))
+        {
+            file.WriteLine(pos.Screen.x + "," + pos.Screen.x + "," + Time.time);
+            //file.WriteLine("" + focusedObject.GetInstanceID());
         }
     }
 
     public void clearpage(int direction)
     {
-        print("direction" + direction);
+        print("direction: " + direction);
         GameObject parentObj = GameObject.Find("Page");
         int childs = parentObj.transform.childCount;
         print("page has " + childs + "childs");
-        foreach (Transform childTransform in parentObj.transform)
+        foreach (Transform child in page.transform)
         {
-            print(""+childTransform.name);
-            if (childTransform.name == "row # 0")
-            {
-                print("first row");
-                foreach (Transform childTransform2 in childTransform.transform)
-                {
-                    print("" + childTransform2.name);
-                    childTransform2.parent = null;
-                    Destroy(childTransform2.gameObject);
-                }
-            }
-            else
-            {
-                Destroy(childTransform.gameObject);
-            }
-            //}
-        }
-        /*
-        int childs = page.transform.childCount;
-        print("page has " + childs + "childs");
-        for (int i = childs - 1; i > 0; i--)
-        {
-            print("erasing page "+page.transform.GetChild(i).name);
-            page.transform.GetChild(i).SetParent(null);
 
-        }*/
+            print(child.name);
+            Destroy(child.gameObject);
+
+        }
+
         if (direction > 0)
         {
-            AddItemToGrid();
+            print("foward");
+            AddItemToGrid(direction);
         }
-        else { GoBack(); }
+        else
+        {
+            print("back");
+            AddItemToGrid(direction);
+            //GoBack(); 
+        }
+
     }
 
-    public void GoBack()
+    public void AddItemToGrid(int direction)
     {
-        AddItemToGrid();
-    }
-
-    public void AddItemToGrid()
-    {
-
 
         GameObject currentRow = firstrow;
 
         ArrayList data = new ArrayList();
+        currentpage += direction;
+
+        if (currentpage  >= numPages)
+            currentpage = 0;
+        else if(currentpage < 0)
+            currentpage = numPages - 1;
 
         data = pages[currentpage];
 
@@ -168,54 +199,149 @@ public class GridEditor : MonoBehaviour {
         xcounter = 0;
         ycounter = 0;
 
-            while (xcounter < data.Count && ycounter < pageend)
-            {
-                if (currentRowLength < maxRowlength)
-                {
-                    currentRowLength += data[xcounter].ToString().Length;
-                    GameObject newText = Instantiate(word);
-                    TextMesh temp = newText.GetComponent(typeof(TextMesh)) as TextMesh;
-                    BoxCollider boxCollider = newText.GetComponent(typeof(BoxCollider)) as BoxCollider;
-                if (data[xcounter].ToString().Length < 5)
-                    temp.text = "__" + data[xcounter].ToString() + "_";
-                else
-                {
-                    temp.text = data[xcounter].ToString();
-                }
-                    temp.characterSize = 25;
-                    //print(temp.text);
-                    newText.AddComponent<BoxCollider>();
-                    newText.name = temp.text;
-                    //newText.text = string.Format("Item {0}", counter.ToString());
-                    newText.transform.parent = currentRow.transform;
-                currentRow.name = "row # " + ycounter;
-            }
-                else
-                {
-                    currentRowLength = 0;
-                    var newrow = Instantiate(row) as GameObject;
-                    ycounter++;
-                    //newText.text = string.Format("Item {0}", counter.ToString());
-                    currentRow = newrow;
-                    currentRow.transform.parent = page.transform;
-                currentRow.name = "row # "+ycounter;
-                }
-                xcounter++;
-            }
+        while (xcounter < data.Count)
+        {
+            //if (currentRowLength < maxRowlength)
+            //{
+                //se suma a la fila la longitud de la palabra que se agregara
+                //currentRowLength += data[xcounter].ToString().Length;
+                
+            //se crea un objeto palabra
+            GameObject newText = Instantiate(word);
+            //se obtiene el text mesh de la palabra
+            TextMesh temp = newText.GetComponent(typeof(TextMesh)) as TextMesh;
+            //BoxCollider boxCollider = newText.GetComponent(typeof(BoxCollider)) as BoxCollider;
 
-        if (currentpage + 1 < numPages)
-            currentpage++;
+            //se le asina el texto al objeto que sera la palabra con color negro y tamaño de caracter 25
+            temp.text = data[xcounter].ToString();
+            temp.color = Color.black;
+            temp.characterSize = 20;
+
+            //se le añade un componente de colision para el funcionamiento con la herramienta tobii
+            newText.AddComponent<BoxCollider>();
+
+            //se pone la palabra como nombre del objeto
+            newText.name = temp.text;
+
+            //se añade la palabra a la cuadricula
+            newText.transform.parent = currentRow.transform;
+
+                //se intenta recalcular la distribucion de las palabras en la fila (horizontal layout)
+                //RectTransform T = currentRow.GetComponent(typeof(RectTransform)) as RectTransform;
+                //LayoutRebuilder.ForceRebuildLayoutImmediate(T);
+
+                //se le da nombre a la cuadricula 
+                currentRow.name = "page # " + currentpage;
+
+                //se crea un objeto word para el espacio en blanco se extrae el componente para el texto y se le asigna un componente para colision
+                GameObject white = Instantiate(word);
+                TextMesh temp2 = white.GetComponent(typeof(TextMesh)) as TextMesh;
+                white.AddComponent<BoxCollider>();
+
+                //se pone guion como texto para visulizar los efectos del espacio en blanco
+                temp2.text = " ";
+                temp2.color = Color.black;
+                temp2.characterSize = 25;
+
+                //se nombra y asigna a la fila                
+                white.name = "espacio en blanco";
+                white.transform.parent = currentRow.transform;
+
+                //se intenta recalcular la distribucion de las palabras en la fila (horizontal layout)
+                //T = currentRow.GetComponent(typeof(RectTransform)) as RectTransform;
+                //LayoutRebuilder.ForceRebuildLayoutImmediate(T);
+                //T = page.GetComponent(typeof(RectTransform)) as RectTransform;
+                //LayoutRebuilder.ForceRebuildLayoutImmediate(T);
+                //Canvas.ForceUpdateCanvases();
+
+            //}
+            //else
+            //{
+                //currentRowLength = 0;
+                //var newrow = Instantiate(row) as GameObject;
+                //ycounter++;
+                //newText.text = string.Format("Item {0}", counter.ToString());
+                //currentRow = newrow;
+                //currentRow.transform.parent = page.transform;
+                //currentRow.name = "row # " + ycounter;
+            //}
+            xcounter++;
+        }
+        
+    }
+
+    public void addword()
+    {
+        GameObject currentRow = firstrow;
+        if (currentRowLength < maxRowlength)
+        {
+            //se suma a la fila la longitud de la palabra que se agregara
+            currentRowLength += "coño".Length;
+            //se crea un objeto palabra
+            GameObject newText = Instantiate(word);
+            //se obtiene el text mesh de la palabra
+            TextMesh temp = newText.GetComponent(typeof(TextMesh)) as TextMesh;
+            //BoxCollider boxCollider = newText.GetComponent(typeof(BoxCollider)) as BoxCollider;
+
+            //se le asina el texto al objeto que sera la palabra con color negro y tamaño de caracter 25
+            temp.text = "word";
+            temp.color = Color.black;
+            temp.characterSize = 25;
+
+            //se le añade un componente de colision para el funcionamiento con la herramienta tobii
+            newText.AddComponent<BoxCollider>();
+
+            //se pone la palabra como nombre del objeto
+            newText.name = temp.text;
+
+            //se añade la palabra a la fila
+            newText.transform.parent = currentRow.transform;
+
+            //se intenta recalcular la distribucion de las palabras en la fila (horizontal layout)
+            RectTransform T = currentRow.GetComponent(typeof(RectTransform)) as RectTransform;
+            LayoutRebuilder.ForceRebuildLayoutImmediate(T);
+
+            //se le da nombre a la fila 
+            currentRow.name = "row # " + ycounter;
+
+            //se crea un objeto word para el espacio en blanco se extrae el componente para el texto y se le asigna un componente para colision
+            GameObject white = Instantiate(word);
+            TextMesh temp2 = white.GetComponent(typeof(TextMesh)) as TextMesh;
+            white.AddComponent<BoxCollider>();
+
+            //se pone guion como texto para visulizar los efectos del espacio en blanco
+            temp2.text = "-";
+            temp2.color = Color.black;
+            temp2.characterSize = 25;
+
+            //se nombra y asigna a la fila                
+            white.name = "espacio en blanco";
+            white.transform.parent = currentRow.transform;
+
+            //se intenta recalcular la distribucion de las palabras en la fila (horizontal layout)
+            T = currentRow.GetComponent(typeof(RectTransform)) as RectTransform;
+            LayoutRebuilder.ForceRebuildLayoutImmediate(T);
+            T = page.GetComponent(typeof(RectTransform)) as RectTransform;
+            LayoutRebuilder.ForceRebuildLayoutImmediate(T);
+            Canvas.ForceUpdateCanvases();
+
+        }
         else
-            currentpage = 0;
+        {
+            currentRowLength = 0;
+            var newrow = Instantiate(row) as GameObject;
+            ycounter++;
+            //newText.text = string.Format("Item {0}", counter.ToString());
+            currentRow = newrow;
+            currentRow.transform.parent = page.transform;
+            currentRow.name = "row # " + ycounter;
+        }
     }
 
     private void init()
     {
-        firstrow = Instantiate(row) as GameObject;
-        //newText.text = string.Format("Item {0}", counter.ToString());
+        firstrow = Instantiate(grid) as GameObject;
         firstrow.transform.parent = page.transform;
-        //AddItemToGrid(firstrow);
-        nextPage.onClick.AddListener(AddItemToGrid);
-        //AddItemToGrid();
+        
     }
 }
