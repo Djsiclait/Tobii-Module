@@ -122,7 +122,7 @@ public class GridEditor : MonoBehaviour
         if (null != focusedObject)
         {
             using (System.IO.StreamWriter file =
-            new System.IO.StreamWriter(@"C:\Users\mc\Desktop\IdTime.txt", true))
+            new System.IO.StreamWriter(@"C:\Users\Djidjelly Siclait\Desktop\HelloWorld.txt", true))
             {
                 file.WriteLine("" + focusedObject.GetInstanceID() + "," + Time.time);
             }
