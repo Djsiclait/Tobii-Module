@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/DynamicGrid.unity
+- path: Assets/Static Positions.unity
   isLoaded: 1
   isActive: 1

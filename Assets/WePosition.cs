@@ -1,13 +1,12 @@
-﻿using UnityEngine;
+﻿using System;
 using System.Collections;
-using UnityEngine.UI;
-using System.IO;
-using System;
-using Tobii.Gaming;
 using System.Collections.Generic;
+using System.IO;
+using Tobii.Gaming;
+using UnityEngine;
+using UnityEngine.UI;
 
-public class Positioner : MonoBehaviour
-{
+public class WePosition : MonoBehaviour {
 
     private int xcounter = 0;
     private int ycounter = 0;
@@ -101,14 +100,14 @@ public class Positioner : MonoBehaviour
         }
         catch (Exception e)
         {
-
             // Let the user know what went wrong.
             Console.WriteLine("The file could not be read:");
             Console.WriteLine(e.Message);
         }
 
         init();
-        AddItemToGrid(0);
+        //AddItemToGrid(0);
+        AddWordsToScreen();
     }
 
     public void fixit()
@@ -188,17 +187,59 @@ public class Positioner : MonoBehaviour
 
     }
 
+    public void AddWordsToScreen()
+    {
+        GameObject currentRow = firstrow;
+        int pointer = 1;
+
+        const int limit = 2127 + 128;
+        int startPointX = 37;
+        int startPointY = -12;
+        int lastWidth = 0;
+
+        foreach(String w in words)
+        {
+            GameObject newWord = Instantiate(word);
+            TextMesh temp = newWord.GetComponent(typeof(TextMesh)) as TextMesh;
+            
+            temp.text = w + " ";
+            temp.color = Color.black;
+            temp.characterSize = 20;
+
+            newWord.AddComponent<BoxCollider>();
+            newWord.name = temp.text;
+
+            newWord.transform.SetPositionAndRotation(new Vector3(startPointX, startPointY), Quaternion.identity);
+
+            // newWord.transform.parent = currentRow.transform;
+            //newWord.transform.parent = page.transform;
+            currentRow.name = "page # " + currentpage;
+
+            BoxCollider box = newWord.GetComponent<BoxCollider>();
+            lastWidth = (int)box.size.x;
+
+            if (startPointX + lastWidth < limit)
+                startPointX += lastWidth;
+            else
+            {
+                startPointX = 37;
+                startPointY -= 25;
+            }
+
+        }
+
+    }
+
     public void AddItemToGrid(int direction)
     {
-
         GameObject currentRow = firstrow;
 
         ArrayList data = new ArrayList();
         currentpage += direction;
 
-        if (currentpage  >= numPages)
+        if (currentpage >= numPages)
             currentpage = 0;
-        else if(currentpage < 0)
+        else if (currentpage < 0)
             currentpage = numPages - 1;
 
         data = pages[currentpage];
@@ -211,9 +252,9 @@ public class Positioner : MonoBehaviour
         {
             //if (currentRowLength < maxRowlength)
             //{
-                //se suma a la fila la longitud de la palabra que se agregara
-                //currentRowLength += data[xcounter].ToString().Length;
-                
+            //se suma a la fila la longitud de la palabra que se agregara
+            //currentRowLength += data[xcounter].ToString().Length;
+
             //se crea un objeto palabra
             GameObject newText = Instantiate(word);
             //se obtiene el text mesh de la palabra
@@ -225,61 +266,57 @@ public class Positioner : MonoBehaviour
             temp.color = Color.black;
             temp.characterSize = 20;
 
-            //se pone la palabra como nombre del objeto
-            newText.name = temp.text;
-
             //se le añade un componente de colision para el funcionamiento con la herramienta tobii
             newText.AddComponent<BoxCollider>();
 
-            BoxCollider boxCollider = newText.GetComponent(typeof(BoxCollider)) as BoxCollider;
-
-            print(boxCollider.size.x);
+            //se pone la palabra como nombre del objeto
+            newText.name = temp.text;
 
             //se añade la palabra a la cuadricula
             newText.transform.parent = currentRow.transform;
 
-                //se intenta recalcular la distribucion de las palabras en la fila (horizontal layout)
-                //RectTransform T = currentRow.GetComponent(typeof(RectTransform)) as RectTransform;
-                //LayoutRebuilder.ForceRebuildLayoutImmediate(T);
+            //se intenta recalcular la distribucion de las palabras en la fila (horizontal layout)
+            //RectTransform T = currentRow.GetComponent(typeof(RectTransform)) as RectTransform;
+            //LayoutRebuilder.ForceRebuildLayoutImmediate(T);
 
-                //se le da nombre a la cuadricula 
-                currentRow.name = "page # " + currentpage;
+            //se le da nombre a la cuadricula 
+            currentRow.name = "page # " + currentpage;
 
-                //se crea un objeto word para el espacio en blanco se extrae el componente para el texto y se le asigna un componente para colision
-                GameObject white = Instantiate(word);
-                TextMesh temp2 = white.GetComponent(typeof(TextMesh)) as TextMesh;
-                white.AddComponent<BoxCollider>();
+            //se crea un objeto word para el espacio en blanco se extrae el componente para el texto y se le asigna un componente para colision
+            GameObject white = Instantiate(word);
+            TextMesh temp2 = white.GetComponent(typeof(TextMesh)) as TextMesh;
+            white.AddComponent<BoxCollider>();
 
-                //se pone guion como texto para visulizar los efectos del espacio en blanco
-                temp2.text = " ";
-                temp2.color = Color.black;
-                temp2.characterSize = 25;
+            //se pone guion como texto para visulizar los efectos del espacio en blanco
+            temp2.text = " ";
+            temp2.color = Color.black;
+            temp2.characterSize = 25;
 
-                //se nombra y asigna a la fila                
-                white.name = "espacio en blanco";
-                white.transform.parent = currentRow.transform;
+            //se nombra y asigna a la fila                
+            white.name = "espacio en blanco";
+            white.transform.parent = currentRow.transform;
 
-                //se intenta recalcular la distribucion de las palabras en la fila (horizontal layout)
-                //T = currentRow.GetComponent(typeof(RectTransform)) as RectTransform;
-                //LayoutRebuilder.ForceRebuildLayoutImmediate(T);
-                //T = page.GetComponent(typeof(RectTransform)) as RectTransform;
-                //LayoutRebuilder.ForceRebuildLayoutImmediate(T);
-                //Canvas.ForceUpdateCanvases();
+            //se intenta recalcular la distribucion de las palabras en la fila (horizontal layout)
+            //T = currentRow.GetComponent(typeof(RectTransform)) as RectTransform;
+            //LayoutRebuilder.ForceRebuildLayoutImmediate(T);
+            //T = page.GetComponent(typeof(RectTransform)) as RectTransform;
+            //LayoutRebuilder.ForceRebuildLayoutImmediate(T);
+            //Canvas.ForceUpdateCanvases();
 
             //}
             //else
             //{
-                //currentRowLength = 0;
-                //var newrow = Instantiate(row) as GameObject;
-                //ycounter++;
-                //newText.text = string.Format("Item {0}", counter.ToString());
-                //currentRow = newrow;
-                //currentRow.transform.parent = page.transform;
-                //currentRow.name = "row # " + ycounter;
+            //currentRowLength = 0;
+            //var newrow = Instantiate(row) as GameObject;
+            //ycounter++;
+            //newText.text = string.Format("Item {0}", counter.ToString());
+            //currentRow = newrow;
+            //currentRow.transform.parent = page.transform;
+            //currentRow.name = "row # " + ycounter;
             //}
             xcounter++;
         }
-        
+
     }
 
     public void addword()
@@ -307,7 +344,6 @@ public class Positioner : MonoBehaviour
             newText.name = temp.text;
 
             //se añade la palabra a la fila
-            //print(newText.)
             newText.transform.parent = currentRow.transform;
 
             //se intenta recalcular la distribucion de las palabras en la fila (horizontal layout)
@@ -355,12 +391,12 @@ public class Positioner : MonoBehaviour
     {
         firstrow = Instantiate(grid) as GameObject;
         firstrow.transform.parent = page.transform;
-        
+
     }
 
     private void fillStatistics()
     {
-        foreach(String word in words)
+        foreach (String word in words)
         {
             averageWordLength += word.Length;
             if (word.Length > longestWord)
