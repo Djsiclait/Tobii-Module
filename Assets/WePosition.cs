@@ -10,8 +10,6 @@ public class WePosition : MonoBehaviour {
 
     private int xcounter = 0;
     private int ycounter = 0;
-    private int pagestart = 0;
-    private int pageend = 8;
     private int currentRowLength = 0;
     private GameObject firstrow;
     public GameObject page;
@@ -22,22 +20,22 @@ public class WePosition : MonoBehaviour {
     private ArrayList words;
     private List<ArrayList> pages;
     private int currentpage;
-    private static int maxRowlength;
-    private static int maxLines = 5;
     private int numPages;
+
+    // TOBII VARIABLES
     private GazePoint pos;
     private GameObject focusedObject;
 
-    // Statistics
-    private int averageWordLength = 0;
-    private int longestWord = 0;
+    private const int wordCountLimit = 700;
+
+    // Registry to know which objects to destroy before changing pages
+    private ArrayList blacklist;
 
     // Use this for initialization
     void Start()
     {
         words = new ArrayList();
         pages = new List<ArrayList>();
-        maxRowlength = 120;
         pos = TobiiAPI.GetGazePoint();
         try
         {
@@ -55,13 +53,9 @@ public class WePosition : MonoBehaviour {
                 }
             }
 
-            fillStatistics();
-            print("average Length: " + averageWordLength);
-            print("Longest word length: " + longestWord);
-
-            numPages = (int)Math.Ceiling((decimal)words.Count / (decimal)(maxRowlength * maxLines));
-            print(words.Count);
-            print(numPages);
+            numPages = (int)Math.Ceiling((decimal)words.Count / wordCountLimit);
+            print("Total words: " + words.Count);
+            print("Posible #pages: " + numPages);
 
             int j = 0;
             int counter = 1;
@@ -69,14 +63,9 @@ public class WePosition : MonoBehaviour {
 
             foreach (String s in words)
             {
-                if (counter < numPages) // first and next pages
+                if (j < wordCountLimit - 1 )
                 {
-                    if (j < (maxRowlength * maxLines) - 1)
-                    {
-                        buffer.Add(s);
-                        j++;
-                    }
-                    else
+                    if (s[s.Length - 1] == '.' && (wordCountLimit - j <= 50 || wordCountLimit - j <= 100))
                     {
                         buffer.Add(s);
                         print("buffer = " + buffer.Count);
@@ -84,17 +73,26 @@ public class WePosition : MonoBehaviour {
                         j = 0; counter++;
                         buffer = new ArrayList();
                     }
+                    else
+                    {
+                        buffer.Add(s);
+                        j++;
+                    }
                 }
-                else // last page
+                else
                 {
                     buffer.Add(s);
+                    print("buffer = " + buffer.Count);
+                    pages.Add(buffer);
+                    j = 0; counter++;
+                    buffer = new ArrayList();
                 }
             }
 
             print("buffer = " + buffer.Count);
             pages.Add(buffer);
 
-            print("Pages =" + pages.Count);
+            print("Real Pages =" + pages.Count);
             currentpage = 0;
 
         }
@@ -107,7 +105,9 @@ public class WePosition : MonoBehaviour {
 
         init();
         //AddItemToGrid(0);
-        AddWordsToScreen();
+        AddWordsToScreen(0);
+        //ClearPage(0);
+        //AddWordsToScreen(1);
     }
 
     public void fixit()
@@ -159,232 +159,56 @@ public class WePosition : MonoBehaviour {
         }
     }
 
-    public void clearpage(int direction)
+    public void ClearPage(int direction)
     {
-        print("direction: " + direction);
-        GameObject parentObj = GameObject.Find("Page");
-        int childs = parentObj.transform.childCount;
-        print("page has " + childs + "childs");
-        foreach (Transform child in page.transform)
+        foreach(GameObject word in blacklist)
         {
-
-            print(child.name);
-            Destroy(child.gameObject);
-
+            Destroy(word);
         }
 
-        if (direction > 0)
-        {
-            print("foward");
-            AddItemToGrid(direction);
-        }
-        else
-        {
-            print("back");
-            AddItemToGrid(direction);
-            //GoBack(); 
-        }
+        print("Eliminated candidates");
 
     }
 
-    public void AddWordsToScreen()
+    public void AddWordsToScreen(int pageIndex)
     {
-        GameObject currentRow = firstrow;
+        blacklist = new ArrayList();
         int pointer = 1;
 
-        const int limit = 2127 + 128;
+        const int limit = 2127;
         int startPointX = 37;
         int startPointY = -12;
         int lastWidth = 0;
 
-        foreach(String w in words)
+        foreach(String w in pages[pageIndex])
         {
             GameObject newWord = Instantiate(word);
             TextMesh temp = newWord.GetComponent(typeof(TextMesh)) as TextMesh;
             
-            temp.text = w + " ";
+            temp.text = w + "  ";
             temp.color = Color.black;
             temp.characterSize = 20;
 
             newWord.AddComponent<BoxCollider>();
             newWord.name = temp.text;
-
             newWord.transform.SetPositionAndRotation(new Vector3(startPointX, startPointY), Quaternion.identity);
-
-            // newWord.transform.parent = currentRow.transform;
-            //newWord.transform.parent = page.transform;
-            currentRow.name = "page # " + currentpage;
 
             BoxCollider box = newWord.GetComponent<BoxCollider>();
             lastWidth = (int)box.size.x;
+            
+            blacklist.Add(newWord);
 
             if (startPointX + lastWidth < limit)
                 startPointX += lastWidth;
             else
             {
                 startPointX = 37;
-                startPointY -= 25;
+                startPointY -= 30;
             }
 
         }
 
-    }
-
-    public void AddItemToGrid(int direction)
-    {
-        GameObject currentRow = firstrow;
-
-        ArrayList data = new ArrayList();
-        currentpage += direction;
-
-        if (currentpage >= numPages)
-            currentpage = 0;
-        else if (currentpage < 0)
-            currentpage = numPages - 1;
-
-        data = pages[currentpage];
-
-        print(data.Count);
-        xcounter = 0;
-        ycounter = 0;
-
-        while (xcounter < data.Count)
-        {
-            //if (currentRowLength < maxRowlength)
-            //{
-            //se suma a la fila la longitud de la palabra que se agregara
-            //currentRowLength += data[xcounter].ToString().Length;
-
-            //se crea un objeto palabra
-            GameObject newText = Instantiate(word);
-            //se obtiene el text mesh de la palabra
-            TextMesh temp = newText.GetComponent(typeof(TextMesh)) as TextMesh;
-            //BoxCollider boxCollider = newText.GetComponent(typeof(BoxCollider)) as BoxCollider;
-
-            //se le asina el texto al objeto que sera la palabra con color negro y tamaño de caracter 25
-            temp.text = data[xcounter].ToString();
-            temp.color = Color.black;
-            temp.characterSize = 20;
-
-            //se le añade un componente de colision para el funcionamiento con la herramienta tobii
-            newText.AddComponent<BoxCollider>();
-
-            //se pone la palabra como nombre del objeto
-            newText.name = temp.text;
-
-            //se añade la palabra a la cuadricula
-            newText.transform.parent = currentRow.transform;
-
-            //se intenta recalcular la distribucion de las palabras en la fila (horizontal layout)
-            //RectTransform T = currentRow.GetComponent(typeof(RectTransform)) as RectTransform;
-            //LayoutRebuilder.ForceRebuildLayoutImmediate(T);
-
-            //se le da nombre a la cuadricula 
-            currentRow.name = "page # " + currentpage;
-
-            //se crea un objeto word para el espacio en blanco se extrae el componente para el texto y se le asigna un componente para colision
-            GameObject white = Instantiate(word);
-            TextMesh temp2 = white.GetComponent(typeof(TextMesh)) as TextMesh;
-            white.AddComponent<BoxCollider>();
-
-            //se pone guion como texto para visulizar los efectos del espacio en blanco
-            temp2.text = " ";
-            temp2.color = Color.black;
-            temp2.characterSize = 25;
-
-            //se nombra y asigna a la fila                
-            white.name = "espacio en blanco";
-            white.transform.parent = currentRow.transform;
-
-            //se intenta recalcular la distribucion de las palabras en la fila (horizontal layout)
-            //T = currentRow.GetComponent(typeof(RectTransform)) as RectTransform;
-            //LayoutRebuilder.ForceRebuildLayoutImmediate(T);
-            //T = page.GetComponent(typeof(RectTransform)) as RectTransform;
-            //LayoutRebuilder.ForceRebuildLayoutImmediate(T);
-            //Canvas.ForceUpdateCanvases();
-
-            //}
-            //else
-            //{
-            //currentRowLength = 0;
-            //var newrow = Instantiate(row) as GameObject;
-            //ycounter++;
-            //newText.text = string.Format("Item {0}", counter.ToString());
-            //currentRow = newrow;
-            //currentRow.transform.parent = page.transform;
-            //currentRow.name = "row # " + ycounter;
-            //}
-            xcounter++;
-        }
-
-    }
-
-    public void addword()
-    {
-        GameObject currentRow = firstrow;
-        if (currentRowLength < maxRowlength)
-        {
-            //se suma a la fila la longitud de la palabra que se agregara
-            currentRowLength += "coño".Length;
-            //se crea un objeto palabra
-            GameObject newText = Instantiate(word);
-            //se obtiene el text mesh de la palabra
-            TextMesh temp = newText.GetComponent(typeof(TextMesh)) as TextMesh;
-            //BoxCollider boxCollider = newText.GetComponent(typeof(BoxCollider)) as BoxCollider;
-
-            //se le asina el texto al objeto que sera la palabra con color negro y tamaño de caracter 25
-            temp.text = "word";
-            temp.color = Color.black;
-            temp.characterSize = 25;
-
-            //se le añade un componente de colision para el funcionamiento con la herramienta tobii
-            newText.AddComponent<BoxCollider>();
-
-            //se pone la palabra como nombre del objeto
-            newText.name = temp.text;
-
-            //se añade la palabra a la fila
-            newText.transform.parent = currentRow.transform;
-
-            //se intenta recalcular la distribucion de las palabras en la fila (horizontal layout)
-            RectTransform T = currentRow.GetComponent(typeof(RectTransform)) as RectTransform;
-            LayoutRebuilder.ForceRebuildLayoutImmediate(T);
-
-            //se le da nombre a la fila 
-            currentRow.name = "row # " + ycounter;
-
-            //se crea un objeto word para el espacio en blanco se extrae el componente para el texto y se le asigna un componente para colision
-            GameObject white = Instantiate(word);
-            TextMesh temp2 = white.GetComponent(typeof(TextMesh)) as TextMesh;
-            white.AddComponent<BoxCollider>();
-
-            //se pone guion como texto para visulizar los efectos del espacio en blanco
-            temp2.text = "-";
-            temp2.color = Color.black;
-            temp2.characterSize = 25;
-
-            //se nombra y asigna a la fila                
-            white.name = "espacio en blanco";
-            white.transform.parent = currentRow.transform;
-
-            //se intenta recalcular la distribucion de las palabras en la fila (horizontal layout)
-            T = currentRow.GetComponent(typeof(RectTransform)) as RectTransform;
-            LayoutRebuilder.ForceRebuildLayoutImmediate(T);
-            T = page.GetComponent(typeof(RectTransform)) as RectTransform;
-            LayoutRebuilder.ForceRebuildLayoutImmediate(T);
-            Canvas.ForceUpdateCanvases();
-
-        }
-        else
-        {
-            currentRowLength = 0;
-            var newrow = Instantiate(row) as GameObject;
-            ycounter++;
-            //newText.text = string.Format("Item {0}", counter.ToString());
-            currentRow = newrow;
-            currentRow.transform.parent = page.transform;
-            currentRow.name = "row # " + ycounter;
-        }
+        print("There are " + blacklist.Count + " candidates to eliminate.");
     }
 
     private void init()
@@ -392,17 +216,5 @@ public class WePosition : MonoBehaviour {
         firstrow = Instantiate(grid) as GameObject;
         firstrow.transform.parent = page.transform;
 
-    }
-
-    private void fillStatistics()
-    {
-        foreach (String word in words)
-        {
-            averageWordLength += word.Length;
-            if (word.Length > longestWord)
-                longestWord = word.Length;
-        }
-
-        averageWordLength = (int)(averageWordLength / words.Count);
     }
 }
