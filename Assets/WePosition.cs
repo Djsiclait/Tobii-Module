@@ -16,7 +16,7 @@ public class WePosition : MonoBehaviour {
     public GameObject row;
     public GameObject grid;
     public GameObject word;
-    public Button nextPage;
+    public Button pagePosition;
     private ArrayList words;
     private List<ArrayList> pages;
     private int currentpage;
@@ -105,9 +105,27 @@ public class WePosition : MonoBehaviour {
 
         init();
         //AddItemToGrid(0);
-        AddWordsToScreen(0);
+        AddWordsToScreen(currentpage);
         //ClearPage(0);
         //AddWordsToScreen(1);
+    }
+
+    public void PreviousPage()
+    {
+        if (currentpage != 0)
+        {
+            ClearPage();
+            AddWordsToScreen(--currentpage);
+        }
+    }
+
+    public void NextPage()
+    {
+        if (currentpage != pages.Count - 1)
+        {
+            ClearPage();
+            AddWordsToScreen(++currentpage);
+        }
     }
 
     public void fixit()
@@ -159,7 +177,7 @@ public class WePosition : MonoBehaviour {
         }
     }
 
-    public void ClearPage(int direction)
+    public void ClearPage()
     {
         foreach(GameObject word in blacklist)
         {
@@ -207,6 +225,10 @@ public class WePosition : MonoBehaviour {
             }
 
         }
+
+        GameObject parentObj = GameObject.Find("Pages");
+        Text position = parentObj.GetComponentInChildren<Text>();
+        position.text = (currentpage + 1).ToString() + " de " + pages.Count.ToString();
 
         print("There are " + blacklist.Count + " candidates to eliminate.");
     }
