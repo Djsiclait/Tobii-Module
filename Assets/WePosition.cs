@@ -176,7 +176,7 @@ public class WePosition : MonoBehaviour {
         int pointer = 1;
 
         const int limit = 2127;
-        int startPointX = 37;
+        int startPointX = 47;
         int startPointY = -12;
         int lastWidth = 0;
 
@@ -202,7 +202,7 @@ public class WePosition : MonoBehaviour {
                 startPointX += lastWidth;
             else
             {
-                startPointX = 37;
+                startPointX = 47;
                 startPointY -= 30;
             }
 
