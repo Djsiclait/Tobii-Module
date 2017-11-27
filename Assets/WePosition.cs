@@ -16,7 +16,6 @@ public class WePosition : MonoBehaviour {
     public GameObject row;
     public GameObject grid;
     public GameObject word;
-    public Button pagePosition;
     private ArrayList words;
     private List<ArrayList> pages;
     private int currentpage;
@@ -226,7 +225,7 @@ public class WePosition : MonoBehaviour {
 
         }
 
-        GameObject parentObj = GameObject.Find("Pages");
+        GameObject parentObj = GameObject.Find("Index");
         Text position = parentObj.GetComponentInChildren<Text>();
         position.text = (currentpage + 1).ToString() + " de " + pages.Count.ToString();
 
