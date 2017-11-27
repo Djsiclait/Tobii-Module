@@ -251,6 +251,6 @@ public class WePosition : MonoBehaviour {
             print("Saving page screenshot");
         }
         else
-            print("THis page already exist");
+            print("This page already exist");
     }
 }
