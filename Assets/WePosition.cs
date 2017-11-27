@@ -230,6 +230,8 @@ public class WePosition : MonoBehaviour {
         position.text = (currentpage + 1).ToString() + " de " + pages.Count.ToString();
 
         print("There are " + blacklist.Count + " candidates to eliminate.");
+
+        SavePageScreenshot();
     }
 
     private void init()
@@ -237,5 +239,18 @@ public class WePosition : MonoBehaviour {
         firstrow = Instantiate(grid) as GameObject;
         firstrow.transform.parent = page.transform;
 
+    }
+
+    private void SavePageScreenshot()
+    {
+        string file = "page" + (currentpage + 1).ToString() + ".png";
+
+        if (!File.Exists(file))
+        {
+            Application.CaptureScreenshot(file);
+            print("Saving page screenshot");
+        }
+        else
+            print("THis page already exist");
     }
 }
