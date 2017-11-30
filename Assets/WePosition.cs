@@ -148,7 +148,7 @@ public class WePosition : MonoBehaviour {
             using (System.IO.StreamWriter file =
             new System.IO.StreamWriter(@"C:\Users\Djidjelly Siclait\Desktop\data.txt", true))
             {
-                file.WriteLine("" + focusedObject.GetInstanceID() + "," + Time.time);
+                file.WriteLine(pos.Screen.x + "," + (620 - pos.Screen.y));
             }
 
             /*using (System.IO.StreamWriter file = 
@@ -164,7 +164,7 @@ public class WePosition : MonoBehaviour {
             using (System.IO.StreamWriter file =
             new System.IO.StreamWriter(@"C:\Users\mc\Desktop\IdTime.txt", true))
             {
-                file.WriteLine("N/A , " + Time.time);
+                file.WriteLine( + Time.time);
             }
 
         }
