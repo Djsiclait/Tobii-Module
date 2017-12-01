@@ -145,10 +145,12 @@ public class WePosition : MonoBehaviour {
 
         if (null != focusedObject)
         {
+            String URL = @"C:\Users\Djidjelly Siclait\Desktop\reading" + (currentpage + 1).ToString() + ".txt";
             using (System.IO.StreamWriter file =
-            new System.IO.StreamWriter(@"C:\Users\Djidjelly Siclait\Desktop\data.txt", true))
+            new System.IO.StreamWriter(URL, true))
             {
-                file.WriteLine(pos.Screen.x + "," + (620 - pos.Screen.y));
+                if(10 < pos.Screen.x && pos.Screen.x < 2300 && 10 < (597 - pos.Screen.y))
+                    file.WriteLine(pos.Screen.x + "," + (597 - pos.Screen.y));
             }
 
             /*using (System.IO.StreamWriter file = 
