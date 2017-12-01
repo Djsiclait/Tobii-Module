@@ -103,10 +103,9 @@ public class WePosition : MonoBehaviour {
         }
 
         init();
-        //AddItemToGrid(0);
+
         AddWordsToScreen(currentpage);
-        //ClearPage(0);
-        //AddWordsToScreen(1);
+
     }
 
     public void PreviousPage()
@@ -137,44 +136,27 @@ public class WePosition : MonoBehaviour {
     // Update is called once per frame
     void Update()
     {
-        //if (TobiiAPI.GetFocusedObject() != null) {
-        //  print(TobiiAPI.GetFocusedObject().name);
-        //}
         focusedObject = TobiiAPI.GetFocusedObject();
         pos = TobiiAPI.GetGazePoint();
 
         if (null != focusedObject)
         {
-            String URL = @"C:\Users\Djidjelly Siclait\Desktop\reading" + (currentpage + 1).ToString() + ".txt";
+            String URL1 = @"C:\Users\Djidjelly Siclait\Desktop\reading" + (currentpage + 1).ToString() + ".txt";
             using (System.IO.StreamWriter file =
-            new System.IO.StreamWriter(URL, true))
+            new System.IO.StreamWriter(URL1, true))
             {
                 if(10 < pos.Screen.x && pos.Screen.x < 2300 && 10 < (597 - pos.Screen.y))
                     file.WriteLine(pos.Screen.x + "," + (597 - pos.Screen.y));
             }
 
-            /*using (System.IO.StreamWriter file = 
-				new System.IO.StreamWriter(@"C:\Users\mc\Desktop\WriteLines2.txt", true))
-			{
-				file.WriteLine("The focused game object is: " + focusedObject.name + " (ID: " + focusedObject.GetInstanceID() + ")");
-				file.WriteLine(""+focusedObject.GetInstanceID());
-			}*/
-            print("The focused game object is: " + focusedObject.name + " (ID: " + focusedObject.GetInstanceID() + ")");
-        }
-        else
-        {
+            String URL2 = @"C:\Users\Djidjelly Siclait\Desktop\keywords.txt";
             using (System.IO.StreamWriter file =
-            new System.IO.StreamWriter(@"C:\Users\mc\Desktop\IdTime.txt", true))
+            new System.IO.StreamWriter(URL2, true))
             {
-                file.WriteLine( + Time.time);
+                file.WriteLine(focusedObject.name + "," + (currentpage + 1).ToString() + "," + Time.time);
             }
 
-        }
-        using (System.IO.StreamWriter file =
-                new System.IO.StreamWriter(@"C:\Users\mc\Desktop\posTime.txt", true))
-        {
-            file.WriteLine(pos.Screen.x + "," + pos.Screen.x + "," + Time.time);
-            //file.WriteLine("" + focusedObject.GetInstanceID());
+            print("The focused game object is: " + focusedObject.name + " (ID: " + focusedObject.GetInstanceID() + ")");
         }
     }
 
