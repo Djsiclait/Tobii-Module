@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using Tobii.Gaming;
 using UnityEngine;
 using UnityEngine.UI;
@@ -11,7 +12,6 @@ public class WePosition : MonoBehaviour {
     private int xcounter = 0;
     private int ycounter = 0;
     private int currentRowLength = 0;
-    private GameObject firstrow;
     public GameObject page;
     public GameObject row;
     public GameObject grid;
@@ -25,7 +25,7 @@ public class WePosition : MonoBehaviour {
     private GazePoint pos;
     private GameObject focusedObject;
 
-    private const int wordCountLimit = 700;
+    private const int wordCountLimit = 600;
 
     // Registry to know which objects to destroy before changing pages
     private ArrayList blacklist;
@@ -40,7 +40,7 @@ public class WePosition : MonoBehaviour {
         {
             // Create an instance of StreamReader to read from a file.
             // The using statement also closes the StreamReader.
-            using (StreamReader sr = new StreamReader("C:/Users/Djidjelly Siclait/Desktop/Hello.txt"))
+            using (StreamReader sr = new StreamReader(GetRelativePath() + "Hello.txt"))
             {
                 string line;
 
@@ -121,7 +121,7 @@ public class WePosition : MonoBehaviour {
     {
         if(currentpage == pages.Count - 1)
         {
-            String URL = @"C:\Users\Djidjelly Siclait\Desktop\meta.txt";
+            String URL = GetRelativePath() + "meta.txt";
             using (System.IO.StreamWriter file =
             new System.IO.StreamWriter(URL, true))
             {
@@ -153,19 +153,19 @@ public class WePosition : MonoBehaviour {
 
         if (null != focusedObject)
         {
-            String URL1 = @"C:\Users\Djidjelly Siclait\Desktop\reading" + (currentpage + 1).ToString() + ".txt";
+            String URL1 = GetRelativePath() + "reading" + (currentpage + 1).ToString() + ".txt";
             using (System.IO.StreamWriter file =
             new System.IO.StreamWriter(URL1, true))
             {
-                if(10 < pos.Screen.x && pos.Screen.x < 2300 && 10 < (597 - pos.Screen.y))
-                    file.WriteLine(pos.Screen.x + "," + (597 - pos.Screen.y));
+                //if(30 < pos.Screen.x && pos.Screen.x < 2100 && 10 < (768 - pos.Screen.y))
+                    file.WriteLine(pos.Screen.x + "," + (pos.Screen.y - 12));
             }
 
-            String URL2 = @"C:\Users\Djidjelly Siclait\Desktop\keywords.txt";
+            String URL2 = GetRelativePath() + "keywords.txt";
             using (System.IO.StreamWriter file =
             new System.IO.StreamWriter(URL2, true))
             {
-                file.WriteLine(focusedObject.name + "," + (currentpage + 1).ToString() + "," + Time.time);
+                file.WriteLine(focusedObject.name.Split(' ')[0] + "," + (currentpage + 1).ToString() + "," + Time.time);
             }
 
             print("The focused game object is: " + focusedObject.name + " (ID: " + focusedObject.GetInstanceID() + ")");
@@ -188,8 +188,8 @@ public class WePosition : MonoBehaviour {
     {
         blacklist = new ArrayList();
 
-        const int limit = 2127;
-        int startPointX = 47;
+        const int limit = 1900;
+        int startPointX = 300;
         int startPointY = -12;
         int lastWidth = 0;
 
@@ -215,7 +215,7 @@ public class WePosition : MonoBehaviour {
                 startPointX += lastWidth;
             else
             {
-                startPointX = 47;
+                startPointX = 300;
                 startPointY -= 30;
             }
 
@@ -232,15 +232,11 @@ public class WePosition : MonoBehaviour {
 
     private void init()
     {
-        firstrow = Instantiate(grid) as GameObject;
-        firstrow.transform.parent = page.transform;
-
-        String URL = @"C:\Users\Djidjelly Siclait\Desktop\meta.txt";
+        String URL = GetRelativePath() + "meta.txt";
         using (System.IO.StreamWriter file =
         new System.IO.StreamWriter(URL, false))
         {
             file.WriteLine("pages:" + pages.Count);
-
             int count = 1;
             int sum = 0;
             foreach (ArrayList p in pages)
@@ -256,7 +252,7 @@ public class WePosition : MonoBehaviour {
 
     private void SavePageScreenshot()
     {
-        string file = "page" + (currentpage + 1).ToString() + ".png";
+        string file = GetRelativePath() + "page" + (currentpage + 1).ToString() + ".png";
 
         if (!File.Exists(file))
         {
@@ -265,5 +261,19 @@ public class WePosition : MonoBehaviour {
         }
         else
             print("This page already exist");
+    }
+
+    private String GetRelativePath()
+    {
+        String data = "";
+       var outPutDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase);
+
+        foreach (String clip in outPutDirectory.Split('\\'))
+            if (clip.Equals("Test_Data"))
+                break;
+            else
+                data += clip + "/";
+
+        return data.Substring(6);
     }
 }
