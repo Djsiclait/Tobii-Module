@@ -20,7 +20,6 @@ public class WePosition : MonoBehaviour {
     private List<ArrayList> pages;
     private int currentpage;
     private int numPages;
-    private bool trigger_end_game = false;
 
     // TOBII VARIABLES
     private GazePoint pos;
@@ -129,7 +128,7 @@ public class WePosition : MonoBehaviour {
                 file.WriteLine("finish_time:" + DateTime.Now.ToString("h:mm:ss"));
             }
 
-            trigger_end_game = true;
+            Application.Quit();
         }
 
         if (currentpage != pages.Count - 1)
@@ -171,9 +170,7 @@ public class WePosition : MonoBehaviour {
 
             print("The focused game object is: " + focusedObject.name + " (ID: " + focusedObject.GetInstanceID() + ")");
         }
-
-        if(trigger_end_game)
-            Application.Quit();
+        
     }
 
     public void ClearPage()
