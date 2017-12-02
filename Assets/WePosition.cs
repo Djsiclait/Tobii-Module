@@ -20,6 +20,7 @@ public class WePosition : MonoBehaviour {
     private List<ArrayList> pages;
     private int currentpage;
     private int numPages;
+    private bool trigger_end_game = false;
 
     // TOBII VARIABLES
     private GazePoint pos;
@@ -119,6 +120,18 @@ public class WePosition : MonoBehaviour {
 
     public void NextPage()
     {
+        if(currentpage == pages.Count - 1)
+        {
+            String URL = @"C:\Users\Djidjelly Siclait\Desktop\meta.txt";
+            using (System.IO.StreamWriter file =
+            new System.IO.StreamWriter(URL, true))
+            {
+                file.WriteLine("finish_time:" + DateTime.Now.ToString("h:mm:ss"));
+            }
+
+            trigger_end_game = true;
+        }
+
         if (currentpage != pages.Count - 1)
         {
             ClearPage();
@@ -158,6 +171,9 @@ public class WePosition : MonoBehaviour {
 
             print("The focused game object is: " + focusedObject.name + " (ID: " + focusedObject.GetInstanceID() + ")");
         }
+
+        if(trigger_end_game)
+            Application.Quit();
     }
 
     public void ClearPage()
@@ -174,7 +190,6 @@ public class WePosition : MonoBehaviour {
     public void AddWordsToScreen(int pageIndex)
     {
         blacklist = new ArrayList();
-        int pointer = 1;
 
         const int limit = 2127;
         int startPointX = 47;
@@ -223,6 +238,23 @@ public class WePosition : MonoBehaviour {
         firstrow = Instantiate(grid) as GameObject;
         firstrow.transform.parent = page.transform;
 
+        String URL = @"C:\Users\Djidjelly Siclait\Desktop\meta.txt";
+        using (System.IO.StreamWriter file =
+        new System.IO.StreamWriter(URL, false))
+        {
+            file.WriteLine("pages:" + pages.Count);
+
+            int count = 1;
+            int sum = 0;
+            foreach (ArrayList p in pages)
+            {
+                file.WriteLine(count++ + ":" + p.Count);
+                sum += p.Count;
+            }
+
+            file.WriteLine("words:" + sum);
+            file.WriteLine("start_time:" + DateTime.Now.ToString("h:mm:ss"));
+        }
     }
 
     private void SavePageScreenshot()
