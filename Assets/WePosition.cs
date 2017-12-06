@@ -20,12 +20,15 @@ public class WePosition : MonoBehaviour {
     private List<ArrayList> pages;
     private int currentpage;
     private int numPages;
+    private const int wordCountLimit = 600;
+
+    private String primaryBuffer = "";
+    private String secondaryBuffer = "";
 
     // TOBII VARIABLES
     private GazePoint pos;
     private GameObject focusedObject;
 
-    private const int wordCountLimit = 600;
 
     // Registry to know which objects to destroy before changing pages
     private ArrayList blacklist;
@@ -128,12 +131,45 @@ public class WePosition : MonoBehaviour {
                 file.WriteLine("finish_time:" + DateTime.Now.ToString("h:mm:ss"));
             }
 
+            String URL1 = GetRelativePath() + "reading" + (currentpage + 1).ToString() + ".txt";
+            using (System.IO.StreamWriter file =
+            new System.IO.StreamWriter(URL1, true))
+            {
+                file.WriteLine(primaryBuffer);
+                primaryBuffer = "";
+            }
+
+            String URL2 = GetRelativePath() + "keywords.txt";
+            using (System.IO.StreamWriter file =
+            new System.IO.StreamWriter(URL2, true))
+            {
+                file.WriteLine(secondaryBuffer);
+                secondaryBuffer = "";
+            }
+
             Application.Quit();
         }
 
         if (currentpage != pages.Count - 1)
         {
             ClearPage();
+
+            String URL1 = GetRelativePath() + "reading" + (currentpage + 1).ToString() + ".txt";
+            using (System.IO.StreamWriter file =
+            new System.IO.StreamWriter(URL1, true))
+            {
+                file.WriteLine(primaryBuffer);
+                primaryBuffer = "";
+            }
+
+            String URL2 = GetRelativePath() + "keywords.txt";
+            using (System.IO.StreamWriter file =
+            new System.IO.StreamWriter(URL2, true))
+            {
+                file.WriteLine(secondaryBuffer);
+                secondaryBuffer = "";
+            }
+
             AddWordsToScreen(++currentpage);
         }
     }
@@ -153,19 +189,25 @@ public class WePosition : MonoBehaviour {
 
         if (null != focusedObject)
         {
+            if (9 < pos.Screen.x && 10 < (755 - pos.Screen.y))
+                primaryBuffer += (pos.Screen.x + 10) + "," + (755 - pos.Screen.y) + "\n";
+
             String URL1 = GetRelativePath() + "reading" + (currentpage + 1).ToString() + ".txt";
             using (System.IO.StreamWriter file =
             new System.IO.StreamWriter(URL1, true))
             {
-                //if(30 < pos.Screen.x && pos.Screen.x < 2100 && 10 < (768 - pos.Screen.y))
-                    file.WriteLine(pos.Screen.x + "," + (pos.Screen.y - 12));
+                file.WriteLine(primaryBuffer);
+                primaryBuffer = "";
             }
+
+            secondaryBuffer += focusedObject.name.Split(' ')[0] + "," + (currentpage + 1).ToString() + "," + Time.time + "\n";
 
             String URL2 = GetRelativePath() + "keywords.txt";
             using (System.IO.StreamWriter file =
             new System.IO.StreamWriter(URL2, true))
             {
-                file.WriteLine(focusedObject.name.Split(' ')[0] + "," + (currentpage + 1).ToString() + "," + Time.time);
+                file.WriteLine(secondaryBuffer);
+                secondaryBuffer = "";
             }
 
             print("The focused game object is: " + focusedObject.name + " (ID: " + focusedObject.GetInstanceID() + ")");
