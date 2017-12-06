@@ -43,7 +43,7 @@ public class WePosition : MonoBehaviour {
         {
             // Create an instance of StreamReader to read from a file.
             // The using statement also closes the StreamReader.
-            using (StreamReader sr = new StreamReader(GetRelativePath() + "Hello.txt"))
+            using (StreamReader sr = new StreamReader(GetRelativePath() + "Shared Assets/input/content.txt"))
             {
                 string line;
 
@@ -117,7 +117,7 @@ public class WePosition : MonoBehaviour {
         {
             ClearPage();
 
-            String URL1 = GetRelativePath() + "reading" + (currentpage + 1).ToString() + ".txt";
+            String URL1 = GetRelativePath() + "Shared Assets/output/reading" + (currentpage + 1).ToString() + ".txt";
             using (System.IO.StreamWriter file =
             new System.IO.StreamWriter(URL1, true))
             {
@@ -125,7 +125,7 @@ public class WePosition : MonoBehaviour {
                 primaryBuffer = "";
             }
 
-            String URL2 = GetRelativePath() + "keywords.txt";
+            String URL2 = GetRelativePath() + "Shared Assets/output/keywords.txt";
             using (System.IO.StreamWriter file =
             new System.IO.StreamWriter(URL2, true))
             {
@@ -141,14 +141,14 @@ public class WePosition : MonoBehaviour {
     {
         if(currentpage == pages.Count - 1)
         {
-            String URL = GetRelativePath() + "meta.txt";
+            String URL = GetRelativePath() + "Shared Assets/output/meta.txt";
             using (System.IO.StreamWriter file =
             new System.IO.StreamWriter(URL, true))
             {
                 file.WriteLine("finish_time:" + DateTime.Now.ToString("h:mm:ss"));
             }
 
-            String URL1 = GetRelativePath() + "reading" + (currentpage + 1).ToString() + ".txt";
+            String URL1 = GetRelativePath() + "Shared Assets/output/reading" + (currentpage + 1).ToString() + ".txt";
             using (System.IO.StreamWriter file =
             new System.IO.StreamWriter(URL1, true))
             {
@@ -156,7 +156,7 @@ public class WePosition : MonoBehaviour {
                 primaryBuffer = "";
             }
 
-            String URL2 = GetRelativePath() + "keywords.txt";
+            String URL2 = GetRelativePath() + "Shared Assets/output/keywords.txt";
             using (System.IO.StreamWriter file =
             new System.IO.StreamWriter(URL2, true))
             {
@@ -171,7 +171,7 @@ public class WePosition : MonoBehaviour {
         {
             ClearPage();
 
-            String URL1 = GetRelativePath() + "reading" + (currentpage + 1).ToString() + ".txt";
+            String URL1 = GetRelativePath() + "Shared Assets/output/reading" + (currentpage + 1).ToString() + ".txt";
             using (System.IO.StreamWriter file =
             new System.IO.StreamWriter(URL1, true))
             {
@@ -179,7 +179,7 @@ public class WePosition : MonoBehaviour {
                 primaryBuffer = "";
             }
 
-            String URL2 = GetRelativePath() + "keywords.txt";
+            String URL2 = GetRelativePath() + "Shared Assets/output/keywords.txt";
             using (System.IO.StreamWriter file =
             new System.IO.StreamWriter(URL2, true))
             {
@@ -189,13 +189,6 @@ public class WePosition : MonoBehaviour {
 
             AddWordsToScreen(++currentpage);
         }
-    }
-
-    public void fixit()
-    {
-        //Canvas.ForceUpdateCanvases();
-        RectTransform T = page.GetComponent(typeof(RectTransform)) as RectTransform;
-        LayoutRebuilder.ForceRebuildLayoutImmediate(T);
     }
 
     // Update is called once per frame
@@ -213,7 +206,7 @@ public class WePosition : MonoBehaviour {
 
             if (Time.time % 15 == 0)
             {
-                String URL1 = GetRelativePath() + "reading" + (currentpage + 1).ToString() + ".txt";
+                String URL1 = GetRelativePath() + "Shared Assets/output/reading" + (currentpage + 1).ToString() + ".txt";
                 using (System.IO.StreamWriter file =
                 new System.IO.StreamWriter(URL1, true))
                 {
@@ -221,7 +214,7 @@ public class WePosition : MonoBehaviour {
                     primaryBuffer = "";
                 }
 
-                String URL2 = GetRelativePath() + "keywords.txt";
+                String URL2 = GetRelativePath() + "Shared Assets/output/keywords.txt";
                 using (System.IO.StreamWriter file =
                 new System.IO.StreamWriter(URL2, true))
                 {
@@ -296,7 +289,7 @@ public class WePosition : MonoBehaviour {
 
     private void init()
     {
-        String URL = GetRelativePath() + "meta.txt";
+        String URL = GetRelativePath() + "Shared Assets/output/meta.txt";
         using (System.IO.StreamWriter file =
         new System.IO.StreamWriter(URL, false))
         {
@@ -316,7 +309,7 @@ public class WePosition : MonoBehaviour {
 
     private void SavePageScreenshot()
     {
-        string file = GetRelativePath() + "page" + (currentpage + 1).ToString() + ".png";
+        string file = GetRelativePath() + "Shared Assets/output/page" + (currentpage + 1).ToString() + ".png";
 
         if (!File.Exists(file))
         {
@@ -333,7 +326,7 @@ public class WePosition : MonoBehaviour {
        var outPutDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().CodeBase);
 
         foreach (String clip in outPutDirectory.Split('\\'))
-            if (clip.Equals("Test_Data"))
+            if (clip.Equals("tobii_Data"))
                 break;
             else
                 data += clip + "/";
