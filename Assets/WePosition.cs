@@ -116,6 +116,23 @@ public class WePosition : MonoBehaviour {
         if (currentpage != 0)
         {
             ClearPage();
+
+            String URL1 = GetRelativePath() + "reading" + (currentpage + 1).ToString() + ".txt";
+            using (System.IO.StreamWriter file =
+            new System.IO.StreamWriter(URL1, true))
+            {
+                file.WriteLine(primaryBuffer);
+                primaryBuffer = "";
+            }
+
+            String URL2 = GetRelativePath() + "keywords.txt";
+            using (System.IO.StreamWriter file =
+            new System.IO.StreamWriter(URL2, true))
+            {
+                file.WriteLine(secondaryBuffer);
+                secondaryBuffer = "";
+            }
+
             AddWordsToScreen(--currentpage);
         }
     }
@@ -190,24 +207,29 @@ public class WePosition : MonoBehaviour {
         if (null != focusedObject)
         {
             if (9 < pos.Screen.x && 10 < (755 - pos.Screen.y))
-                primaryBuffer += (pos.Screen.x + 10) + "," + (755 - pos.Screen.y) + "\n";
+                primaryBuffer += (pos.Screen.x + 10) + "," + (755 - pos.Screen.y) + ":";
 
-            String URL1 = GetRelativePath() + "reading" + (currentpage + 1).ToString() + ".txt";
-            using (System.IO.StreamWriter file =
-            new System.IO.StreamWriter(URL1, true))
+            secondaryBuffer += focusedObject.name.Split(' ')[0] + "," + (currentpage + 1).ToString() + "," + Time.time + ":";
+
+            if (Time.time % 15 == 0)
             {
-                file.WriteLine(primaryBuffer);
-                primaryBuffer = "";
-            }
+                String URL1 = GetRelativePath() + "reading" + (currentpage + 1).ToString() + ".txt";
+                using (System.IO.StreamWriter file =
+                new System.IO.StreamWriter(URL1, true))
+                {
+                    file.WriteLine(primaryBuffer);
+                    primaryBuffer = "";
+                }
 
-            secondaryBuffer += focusedObject.name.Split(' ')[0] + "," + (currentpage + 1).ToString() + "," + Time.time + "\n";
+                String URL2 = GetRelativePath() + "keywords.txt";
+                using (System.IO.StreamWriter file =
+                new System.IO.StreamWriter(URL2, true))
+                {
+                    file.WriteLine(secondaryBuffer);
+                    secondaryBuffer = "";
+                }
 
-            String URL2 = GetRelativePath() + "keywords.txt";
-            using (System.IO.StreamWriter file =
-            new System.IO.StreamWriter(URL2, true))
-            {
-                file.WriteLine(secondaryBuffer);
-                secondaryBuffer = "";
+                print("Transfering to data file.");
             }
 
             print("The focused game object is: " + focusedObject.name + " (ID: " + focusedObject.GetInstanceID() + ")");
